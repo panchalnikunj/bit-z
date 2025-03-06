@@ -148,7 +148,7 @@ namespace dCode {
     //% group="LCD"
     /**
      * show a number in LCD at given position
-     * @param n is number will be show, eg: 10, 100, 200
+     * @param n is number will be show, eg: 0, 100, 200
      * @param x is LCD column position, eg: 0
      * @param y is LCD row position, eg: 0
      */
@@ -165,7 +165,7 @@ namespace dCode {
     //% group="LCD"
     /**
      * show a string in LCD at given position
-     * @param s is string will be show, eg: "Hello"
+     * @param s is string will be show, eg: "Hello!"
      * @param x is LCD column position, [0 - 15], eg: 0
      * @param y is LCD row position, [0 - 1], eg: 0
      */
