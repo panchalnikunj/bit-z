@@ -57,7 +57,6 @@ namespace dCode {
 
 
     //% group="LCD"
-
     let i2cAddr: number // 0x3F: PCF8574A, 0x27: PCF8574
     let BK: number      // backlight control
     let RS: number      // command/data
@@ -120,6 +119,8 @@ namespace dCode {
 
     }
 
+
+    //% group="LCD"
     /**
      * initial LCD, set I2C address. Address is 39/63 for PCF8574/PCF8574A
      * @param Addr is i2c address for LCD, eg: 0, 39, 63. 0 is auto find address
@@ -144,6 +145,7 @@ namespace dCode {
         cmd(0x01)       // clear
     }
 
+    //% group="LCD"
     /**
      * show a number in LCD at given position
      * @param n is number will be show, eg: 10, 100, 200
@@ -160,6 +162,7 @@ namespace dCode {
         ShowString(s, x, y)
     }
 
+    //% group="LCD"
     /**
      * show a string in LCD at given position
      * @param s is string will be show, eg: "Hello"
@@ -186,6 +189,7 @@ namespace dCode {
         }
     }
 
+    //% group="LCD"
     /**
      * turn on LCD
      */
@@ -196,6 +200,7 @@ namespace dCode {
         cmd(0x0C)
     }
 
+    //% group="LCD"
     /**
      * turn off LCD
      */
@@ -206,6 +211,7 @@ namespace dCode {
         cmd(0x08)
     }
 
+    //% group="LCD"
     /**
      * clear all display content
      */
@@ -216,6 +222,7 @@ namespace dCode {
         cmd(0x01)
     }
 
+    //% group="LCD"
     /**
      * turn on LCD backlight
      */
@@ -226,6 +233,7 @@ namespace dCode {
         BK = 8
         cmd(0)
     }
+    //% group="LCD"
 
     /**
      * turn off LCD backlight
@@ -238,6 +246,7 @@ namespace dCode {
         cmd(0)
     }
 
+    //% group="LCD"
     /**
      * shift left
      */
@@ -248,6 +257,7 @@ namespace dCode {
         cmd(0x18)
     }
 
+    //% group="LCD"
     /**
      * shift right
      */
