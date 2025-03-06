@@ -125,7 +125,7 @@ namespace dCode {
      * initial LCD, set I2C address. Address is 39/63 for PCF8574/PCF8574A
      * @param Addr is i2c address for LCD, eg: 0, 39, 63. 0 is auto find address
      */
-    //% blockId="I2C_LCD1620_SET_ADDRESS" block="LCD initialize with Address %addr"
+    //% blockId="I2C_LCD1620_SET_ADDRESS" block="LCD init"
     //% weight=100 blockGap=8
     //% parts=LCD1602_I2C trackArgs=0
     export function LcdInit(Addr: number) {
