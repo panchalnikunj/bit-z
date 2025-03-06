@@ -257,6 +257,50 @@ namespace dCode {
     }
 
 
+
+    /**
+     * turn on LCD backlight
+     */
+    //% blockId="I2C_LCD1620_BACKLIGHT_ON" block="turn on backlight"
+    //% weight=71 blockGap=8
+    //% parts=LCD1602_I2C trackArgs=0
+    export function BacklightOn(): void {
+        BK = 8
+        cmd(0)
+    }
+
+    /**
+     * turn off LCD backlight
+     */
+    //% blockId="I2C_LCD1620_BACKLIGHT_OFF" block="turn off backlight"
+    //% weight=70 blockGap=8
+    //% parts=LCD1602_I2C trackArgs=0
+    export function BacklightOff(): void {
+        BK = 0
+        cmd(0)
+    }
+
+    /**
+     * shift left
+     */
+    //% blockId="I2C_LCD1620_SHL" block="Shift Left"
+    //% weight=61 blockGap=8
+    //% parts=LCD1602_I2C trackArgs=0
+    export function shl(): void {
+        cmd(0x18)
+    }
+
+    /**
+     * shift right
+     */
+    //% blockId="I2C_LCD1620_SHR" block="Shift Right"
+    //% weight=60 blockGap=8
+    //% parts=LCD1602_I2C trackArgs=0
+    export function shr(): void {
+        cmd(0x1C)
+    }
+
+
     //% group="Actuators"
     //% blockId=servo_motor block="set servo %servo to %angle°"
     //% angle.min=0 angle.max=180
