@@ -4,41 +4,48 @@ namespace dCode {
 
 
 
+    const DHT11_PIN = DigitalPin.P0; // Default pin for DHT11
 
     //% group="Sensors"
-    //% blockId=dht11_sensor block="read DHT11 %dhtData at pin %pin"
-    //% pin.defl=DigitalPin.P2
-    export function readDHT11(dhtData: DHT11Data, pin: DigitalPin): number {
-        let buffer: number[] = [];
-        let startTime: number;
-        let signal: number;
+    //% blockId=dht11_sensor block="read DHT11 sensor at pin %pin"
+    //% pin.defl=DigitalPin.P0
+    export function readDHT11(pin: DigitalPin): number[] {
+        let temperature: number = -1;
+        let humidity: number = -1;
+        let data: number[] = [0, 0, 0, 0, 0];
 
-        // Start signal
+        // Signal start
         pins.digitalWritePin(pin, 0);
         basic.pause(18);
         pins.digitalWritePin(pin, 1);
         control.waitMicros(40);
+
+        // Change pin to input
         pins.setPull(pin, PinPullMode.PullUp);
 
-        // Wait for response
-        while (pins.digitalReadPin(pin) == 1);
-        while (pins.digitalReadPin(pin) == 0);
-        while (pins.digitalReadPin(pin) == 1);
-
-        // Read 40-bit data (5 bytes)
-        for (let i = 0; i < 40; i++) {
+        // Wait for sensor response
+        if (pins.digitalReadPin(pin) == 0) {
             while (pins.digitalReadPin(pin) == 0);
-            startTime = control.micros();
             while (pins.digitalReadPin(pin) == 1);
-            signal = control.micros() - startTime;
-            buffer.push(signal > 40 ? 1 : 0);
+
+            // Read 40-bit data
+            for (let i = 0; i < 5; i++) {
+                for (let j = 0; j < 8; j++) {
+                    while (pins.digitalReadPin(pin) == 0);
+                    control.waitMicros(28);
+                    data[i] = (data[i] << 1) | (pins.digitalReadPin(pin) == 1 ? 1 : 0);
+                    while (pins.digitalReadPin(pin) == 1);
+                }
+            }
+
+            // Checksum verification
+            if (data[4] == ((data[0] + data[1] + data[2] + data[3]) & 0xFF)) {
+                humidity = data[0];  // Integer part of humidity
+                temperature = data[2]; // Integer part of temperature
+            }
         }
 
-        // Convert data
-        let humidity = (buffer.slice(0, 8).reduce((a, b) => (a << 1) | b, 0));
-        let temperature = (buffer.slice(16, 24).reduce((a, b) => (a << 1) | b, 0));
-
-        return dhtData == DHT11Data.Temperature ? temperature : humidity;
+        return [temperature, humidity]; // Returns temperature and humidity as an array
     }
 
     //% blockId=dht11_data block="%dhtData"
