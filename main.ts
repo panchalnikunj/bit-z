@@ -369,6 +369,7 @@ namespace dCode {
     //% blockId=digital_sensor block="read Digital sensor at pin %pin"
     //% pin.defl=DigitalPin.P1
     export function readDigitalSensor(pin: DigitalPin): number {
+        pins.setPull(pin, PinPullMode.PullUp);
         return pins.digitalReadPin(pin);
     }
 
