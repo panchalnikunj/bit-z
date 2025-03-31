@@ -1,6 +1,37 @@
 //% color=#000000 icon="\uf2db" block="Bit-Z"
 namespace dCode {
 
+        switch (direction) {
+            case CarDirection.Forward:
+                pins.analogWritePin(AnalogPin.P12, pwmValue);
+                pins.analogWritePin(AnalogPin.P13, 0);
+                pins.analogWritePin(AnalogPin.P14, pwmValue);
+                pins.analogWritePin(AnalogPin.P15, 0);
+                break;
+            case CarDirection.Backward:
+                pins.analogWritePin(AnalogPin.P12, 0);
+                pins.analogWritePin(AnalogPin.P13, pwmValue);
+                pins.analogWritePin(AnalogPin.P14, 0);
+                pins.analogWritePin(AnalogPin.P15, pwmValue);
+                break;
+            case CarDirection.Left:
+                pins.analogWritePin(AnalogPin.P12, 0);
+                pins.analogWritePin(AnalogPin.P13, pwmValue);
+                pins.analogWritePin(AnalogPin.P14, pwmValue);
+                pins.analogWritePin(AnalogPin.P15, 0);
+                break;
+            case CarDirection.Right:
+                pins.analogWritePin(AnalogPin.P12, pwmValue);
+                pins.analogWritePin(AnalogPin.P13, 0);
+                pins.analogWritePin(AnalogPin.P14, 0);
+                pins.analogWritePin(AnalogPin.P15, pwmValue);
+                break;
+            case CarDirection.Stop:
+                pins.analogWritePin(AnalogPin.P12, 0);
+                pins.analogWritePin(AnalogPin.P13, 0);
+                pins.analogWritePin(AnalogPin.P14, 0);
+                pins.analogWritePin(AnalogPin.P15, 0);
+                break;
 
 
 
