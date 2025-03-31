@@ -60,6 +60,117 @@ namespace dCode {
 
 
 
+    //% group="Sensors"
+    //% blockId=digital_sensor block="read Digital sensor at pin %pin"
+    //% pin.defl=DigitalPin.P1
+    export function readDigitalSensor(pin: DigitalPin): number {
+        pins.setPull(pin, PinPullMode.PullUp); // Enable internal pull-up resistor
+        return pins.digitalReadPin(pin);
+    }
+
+
+
+    //% group="Sensors"
+    //% blockId=analog_sensor block="read Analog sensor at pin %pin"
+    //% pin.defl=AnalogPin.P0
+    export function readAnalogSensor(pin: AnalogPin): number {
+        return pins.analogReadPin(pin);
+    }
+
+
+
+
+    //% group="Sensors"
+    //% blockId=dht11_sensor block="read DHT11 %dhtData at pin %pin"
+    //% pin.defl=DigitalPin.P2
+    export function readDHT11(dhtData: DHT11Data, pin: DigitalPin): number {
+        let buffer: number[] = [];
+        let startTime: number;
+        let signal: number;
+
+
+        // Start signal
+        pins.digitalWritePin(pin, 0);
+        basic.pause(18);
+        pins.digitalWritePin(pin, 1);
+        control.waitMicros(40);
+        pins.setPull(pin, PinPullMode.PullUp);
+
+
+        // Wait for response
+        while (pins.digitalReadPin(pin) == 1);
+        while (pins.digitalReadPin(pin) == 0);
+        while (pins.digitalReadPin(pin) == 1);
+
+
+        // Read 40-bit data (5 bytes)
+        for (let i = 0; i < 40; i++) {
+            while (pins.digitalReadPin(pin) == 0);
+            startTime = control.micros();
+            while (pins.digitalReadPin(pin) == 1);
+            signal = control.micros() - startTime;
+            buffer.push(signal > 40 ? 1 : 0);
+        }
+
+
+        // Convert data
+        let humidity = (buffer.slice(0, 8).reduce((a, b) => (a << 1) | b, 0));
+        let temperature = (buffer.slice(16, 24).reduce((a, b) => (a << 1) | b, 0));
+
+
+        return dhtData == DHT11Data.Temperature ? temperature : humidity;
+    }
+
+
+    //% blockId=dht11_data block="%dhtData"
+    //% blockHidden=true
+    export enum DHT11Data {
+        //% block="Temperature (°C)"
+        Temperature = 0,
+        //% block="Humidity (%)"
+        Humidity = 1
+    }
+
+
+
+
+    //% group="Sensors"
+    /**
+    * Measure distance using an ultrasonic sensor.
+    * @return Distance in centimeters
+    */
+    //% block="distance"
+    export function readDistance(): number {
+        let trigger = DigitalPin.P1;
+        let echo = DigitalPin.P0;
+
+        // Send a 10µs pulse to trigger pin
+        pins.digitalWritePin(trigger, 0);
+        control.waitMicros(2);
+        pins.digitalWritePin(trigger, 1);
+        control.waitMicros(10);
+        pins.digitalWritePin(trigger, 0);
+
+        // Measure the pulse duration on echo pin
+        let duration = pins.pulseIn(echo, PulseValue.High, 25000); // Timeout at ~4m
+
+        // Convert duration to distance (speed of sound = 343 m/s)
+        let distance = duration * 0.034 / 2;
+
+        return distance;
+    }
+
+    /**
+     * Check if an obstacle is detected within 30cm.
+     * @return True if obstacle is detected, otherwise false
+     */
+    //% block="obstacle is there"
+    export function isObstacle(): boolean {
+        return readDistance() < 30;
+    }
+
+
+
     //% group="LCD"
     let i2cAddr: number // 0x3F: PCF8574A, 0x27: PCF8574
     let BK: number      // backlight control
@@ -313,106 +424,6 @@ namespace dCode {
         S1 = 0,
         //% block="S2"
         S2 = 1
-    }
-
-
-
-
-
-
-    //% group="Sensors"
-    //% blockId=dht11_sensor block="read DHT11 %dhtData at pin %pin"
-    //% pin.defl=DigitalPin.P2
-    export function readDHT11(dhtData: DHT11Data, pin: DigitalPin): number {
-        let buffer: number[] = [];
-        let startTime: number;
-        let signal: number;
-
-
-        // Start signal
-        pins.digitalWritePin(pin, 0);
-        basic.pause(18);
-        pins.digitalWritePin(pin, 1);
-        control.waitMicros(40);
-        pins.setPull(pin, PinPullMode.PullUp);
-
-
-        // Wait for response
-        while (pins.digitalReadPin(pin) == 1);
-        while (pins.digitalReadPin(pin) == 0);
-        while (pins.digitalReadPin(pin) == 1);
-
-
-        // Read 40-bit data (5 bytes)
-        for (let i = 0; i < 40; i++) {
-            while (pins.digitalReadPin(pin) == 0);
-            startTime = control.micros();
-            while (pins.digitalReadPin(pin) == 1);
-            signal = control.micros() - startTime;
-            buffer.push(signal > 40 ? 1 : 0);
-        }
-
-
-        // Convert data
-        let humidity = (buffer.slice(0, 8).reduce((a, b) => (a << 1) | b, 0));
-        let temperature = (buffer.slice(16, 24).reduce((a, b) => (a << 1) | b, 0));
-
-
-        return dhtData == DHT11Data.Temperature ? temperature : humidity;
-    }
-
-
-    //% blockId=dht11_data block="%dhtData"
-    //% blockHidden=true
-    export enum DHT11Data {
-        //% block="Temperature (°C)"
-        Temperature = 0,
-        //% block="Humidity (%)"
-        Humidity = 1
-    }
-
-
-
-
-    //% group="Sensors"
-    /**
-     * Measures distance in centimeters using an HC-SR04 sensor.
-     * @param trigPin The trigger pin
-     * @param echoPin The echo pin
-     */
-    //% blockId=ultrasonic_distance block="measure distance trig %trigPin| echo %echoPin"
-    //% trigPin.defl=DigitalPin.P0 echoPin.defl=DigitalPin.P1
-    export function measureDistance(trigPin: DigitalPin, echoPin: DigitalPin): number {
-        pins.digitalWritePin(trigPin, 0);
-        control.waitMicros(2);
-        pins.digitalWritePin(trigPin, 1);
-        control.waitMicros(10);
-        pins.digitalWritePin(trigPin, 0);
-
-
-        let duration = pins.pulseIn(echoPin, PulseValue.High, 23000);
-        let distance = duration / 58;
-
-
-        return distance > 400 ? 400 : distance; // Limit to 400 cm (sensor range)
-    }
-
-
-    //% group="Sensors"
-    //% blockId=analog_sensor block="read Analog sensor at pin %pin"
-    //% pin.defl=AnalogPin.P0
-    export function readAnalogSensor(pin: AnalogPin): number {
-        return pins.analogReadPin(pin);
-    }
-
-
-
-
-    //% group="Sensors"
-    //% blockId=digital_sensor block="read Digital sensor at pin %pin"
-    //% pin.defl=DigitalPin.P1
-    export function readDigitalSensor(pin: DigitalPin): number {
-        return pins.digitalReadPin(pin);
     }
 
 }
