@@ -1,5 +1,5 @@
 {
-    "name": "Bit-z",
+    "name": "Bit-z V4",
     "version": "1.0.0",
     "description": "",
     "dependencies": {
@@ -15,7 +15,7 @@
         "test.ts"
     ],
     "targetVersions": {
-        "target": "7.0.57",
+        "target": "7.0.61",
         "targetId": "microbit"
     },
     "supportedTargets": [

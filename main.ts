@@ -78,8 +78,6 @@ namespace dCode {
     }
 
 
-
-
     //% group="Sensors"
     //% blockId=dht11_sensor block="read DHT11 %dhtData at pin %pin"
     //% pin.defl=DigitalPin.P2
