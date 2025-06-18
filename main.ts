@@ -137,6 +137,41 @@ namespace dCode {
     * Measure distance using an ultrasonic sensor.
     * @return Distance in centimeters
     */
+
+    //% block="turn $led LED $state"
+    //% state.shadow="toggleOnOff"
+    //% blockGap=8
+    export function controlLED(led: LedColor, state: boolean): void {
+        let pin: DigitalPin;
+        if (led == LedColor.Red) {
+            pin = DigitalPin.P8;
+        } else if (led == LedColor.Yellow) {
+            pin = DigitalPin.P2;
+        } else {
+            pin = DigitalPin.P0;
+        }
+        pins.digitalWritePin(pin, state ? 1 : 0);
+    }
+
+    //% block="turn all LEDs $state"
+    //% state.shadow="toggleOnOff"
+    //% blockGap=8
+    export function controlAll(state: boolean): void {
+        pins.digitalWritePin(DigitalPin.P0, state ? 1 : 0); // Red
+        pins.digitalWritePin(DigitalPin.P2, state ? 1 : 0); // Yellow
+        pins.digitalWritePin(DigitalPin.P8, state ? 1 : 0); // Green
+    }
+
+    export enum LedColor {
+        //% block="Red"
+        Red,
+        //% block="Yellow"
+        Yellow,
+        //% block="Green"
+        Green
+    }
+
+
     //% block="distance"
     export function readDistance(): number {
         let trigger = DigitalPin.P1;
