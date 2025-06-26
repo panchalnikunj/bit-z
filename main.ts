@@ -173,14 +173,34 @@ namespace dCode {
 
 
     /**
- * Measure distance using ultrasonic sensor
- * @param trig trigger pin
- * @param echo echo pin
+ * Measure distance using ultrasonic sensor based on selected pin
+ * If selected pin is:
+ * - P0 → Trigger: P0, Echo: P1
+ * - P1 → Trigger: P1, Echo: P2
+ * - P2 → Trigger: P2, Echo: P0, and set P8 HIGH
+ * @param selPin pin to select configuration
  * @returns distance in centimeters
  */
-    //% block="distance trig $trig echo $echo"
-    //% trig.shadow="pin" echo.shadow="pin"
-    export function readDistance(trig: DigitalPin, echo: DigitalPin): number {
+    //% block="distance using pin $selPin"
+    //% selPin.shadow="pin"
+    export function readDistanceByPin(selPin: DigitalPin): number {
+        let trig: DigitalPin;
+        let echo: DigitalPin;
+
+        if (selPin == DigitalPin.P0) {
+            trig = DigitalPin.P0;
+            echo = DigitalPin.P1;
+        } else if (selPin == DigitalPin.P1) {
+            trig = DigitalPin.P1;
+            echo = DigitalPin.P2;
+        } else if (selPin == DigitalPin.P2) {
+            trig = DigitalPin.P2;
+            echo = DigitalPin.P0;
+            pins.digitalWritePin(DigitalPin.P8, 1); // Set P8 HIGH
+        } else {
+            return -1; // Invalid pin selected
+        }
+
         // Send a 10µs pulse to trigger pin
         pins.digitalWritePin(trig, 0);
         control.waitMicros(2);
@@ -189,24 +209,24 @@ namespace dCode {
         pins.digitalWritePin(trig, 0);
 
         // Measure the pulse duration on echo pin
-        let duration = pins.pulseIn(echo, PulseValue.High, 25000); // Timeout at ~4m
+        let duration = pins.pulseIn(echo, PulseValue.High, 25000);
 
-        // Convert duration to distance (speed of sound = 343 m/s)
+        // Convert duration to distance in cm
         let distance = duration * 0.034 / 2;
 
         return distance;
     }
 
     /**
-     * Check if an obstacle is detected within 30cm.
-     * @param trig trigger pin
-     * @param echo echo pin
-     * @returns true if obstacle is detected, otherwise false
+     * Check if an obstacle is detected within 30cm based on selected pin
+     * Uses same logic as readDistanceByPin
+     * @param selPin pin to select configuration
+     * @returns true if obstacle is within 30cm
      */
-    //% block="obstacle is there trig $trig echo $echo"
-    //% trig.shadow="pin" echo.shadow="pin"
-    export function isObstacle(trig: DigitalPin, echo: DigitalPin): boolean {
-        return readDistance(trig, echo) < 30;
+    //% block="obstacle is there using pin $selPin"
+    //% selPin.shadow="pin"
+    export function isObstacle(selPin: DigitalPin): boolean {
+        return readDistanceByPin(selPin) < 30;
     }
 
 
