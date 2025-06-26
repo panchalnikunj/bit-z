@@ -172,17 +172,21 @@ namespace dCode {
     }
 
 
-    //% block="distance"
-    export function readDistance(): number {
-        let trigger = DigitalPin.P1;
-        let echo = DigitalPin.P0;
-
+    /**
+ * Measure distance using ultrasonic sensor
+ * @param trig trigger pin
+ * @param echo echo pin
+ * @returns distance in centimeters
+ */
+    //% block="distance trig $trig echo $echo"
+    //% trig.shadow="pin" echo.shadow="pin"
+    export function readDistance(trig: DigitalPin, echo: DigitalPin): number {
         // Send a 10µs pulse to trigger pin
-        pins.digitalWritePin(trigger, 0);
+        pins.digitalWritePin(trig, 0);
         control.waitMicros(2);
-        pins.digitalWritePin(trigger, 1);
+        pins.digitalWritePin(trig, 1);
         control.waitMicros(10);
-        pins.digitalWritePin(trigger, 0);
+        pins.digitalWritePin(trig, 0);
 
         // Measure the pulse duration on echo pin
         let duration = pins.pulseIn(echo, PulseValue.High, 25000); // Timeout at ~4m
@@ -195,11 +199,14 @@ namespace dCode {
 
     /**
      * Check if an obstacle is detected within 30cm.
-     * @return True if obstacle is detected, otherwise false
+     * @param trig trigger pin
+     * @param echo echo pin
+     * @returns true if obstacle is detected, otherwise false
      */
-    //% block="obstacle is there"
-    export function isObstacle(): boolean {
-        return readDistance() < 30;
+    //% block="obstacle is there trig $trig echo $echo"
+    //% trig.shadow="pin" echo.shadow="pin"
+    export function isObstacle(trig: DigitalPin, echo: DigitalPin): boolean {
+        return readDistance(trig, echo) < 30;
     }
 
 
