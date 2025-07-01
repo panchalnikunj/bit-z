@@ -1,4 +1,4 @@
-//% color=#000000 icon="\uf2db" block="Bit-Z"
+//% color=#8b00ff icon="\uf2db" block="Staar-Bot"
 namespace dCode {
     //% group="Car Control"
     //% blockId=car_control block="Move car %direction speed %speed"
