@@ -69,6 +69,16 @@ namespace dCode {
     }
 
 
+    // helper: rotate P0->P1, P1->P2, P2->P0
+    function mapAnalogPin(pin: AnalogPin): AnalogPin {
+        switch (pin) {
+            case AnalogPin.P0: return AnalogPin.P1;
+            case AnalogPin.P1: return AnalogPin.P2;
+            case AnalogPin.P2: return AnalogPin.P0;
+            default: return pin; // leave any other pins unchanged
+        }
+    }
+
 
     //% group="Sensors"
     //% blockId=analog_sensor block="read Analog sensor at pin %pin"
