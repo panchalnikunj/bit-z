@@ -69,23 +69,21 @@ namespace dCode {
     }
 
 
-    // helper: rotate P0->P1, P1->P2, P2->P0
-    function mapAnalogPin(pin: AnalogPin): AnalogPin {
-        switch (pin) {
-            case AnalogPin.P0: return AnalogPin.P1;
-            case AnalogPin.P1: return AnalogPin.P2;
-            case AnalogPin.P2: return AnalogPin.P0;
-            default: return pin; // leave any other pins unchanged
-        }
-    }
-
-
     //% group="Sensors"
     //% blockId=analog_sensor block="read Analog sensor at pin %pin"
     //% pin.defl=AnalogPin.P0
+    //% pin.fieldEditor="gridpicker" pin.fieldOptions.decompileLiterals=true
     export function readAnalogSensor(pin: AnalogPin): number {
-        return pins.analogReadPin(pin);
+        // Rotate P0->P1, P1->P2, P2->P0; pass through others
+        let mapped: AnalogPin;
+        if (pin == AnalogPin.P0) mapped = AnalogPin.P1;
+        else if (pin == AnalogPin.P1) mapped = AnalogPin.P2;
+        else if (pin == AnalogPin.P2) mapped = AnalogPin.P0;
+        else mapped = pin;
+
+        return pins.analogReadPin(mapped);
     }
+
 
 
     //% group="Sensors"
