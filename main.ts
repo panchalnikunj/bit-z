@@ -183,7 +183,7 @@ namespace dCode {
     /**
  * Measure distance using ultrasonic sensor based on selected pin
  * If selected pin is:
- * - P0 → Trigger: P0, Echo: P1
+ * - P0 → Trigger: P1, Echo: P0
  * - P1 → Trigger: P1, Echo: P2
  * - P2 → Trigger: P2, Echo: P0, and set P8 HIGH
  * @param selPin pin to select configuration
@@ -199,11 +199,11 @@ namespace dCode {
             trig = DigitalPin.P1;
             echo = DigitalPin.P0;
         } else if (selPin == DigitalPin.P1) {
-            trig = DigitalPin.P1;
-            echo = DigitalPin.P2;
-        } else if (selPin == DigitalPin.P2) {
             trig = DigitalPin.P2;
-            echo = DigitalPin.P0;
+            echo = DigitalPin.P1;
+        } else if (selPin == DigitalPin.P2) {
+            trig = DigitalPin.P0;
+            echo = DigitalPin.P2;
             pins.digitalWritePin(DigitalPin.P8, 1); // Set P8 HIGH
         } else {
             return -1; // Invalid pin selected
