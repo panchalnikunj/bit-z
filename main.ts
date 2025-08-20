@@ -196,8 +196,8 @@ namespace dCode {
         let echo: DigitalPin;
 
         if (selPin == DigitalPin.P0) {
-            trig = DigitalPin.P0;
-            echo = DigitalPin.P1;
+            trig = DigitalPin.P1;
+            echo = DigitalPin.P0;
         } else if (selPin == DigitalPin.P1) {
             trig = DigitalPin.P1;
             echo = DigitalPin.P2;
