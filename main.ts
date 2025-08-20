@@ -217,7 +217,7 @@ namespace dCode {
         pins.digitalWritePin(trig, 0);
 
         // Measure the pulse duration on echo pin
-        let duration = pins.pulseIn(echo, PulseValue.High, 25000);
+        let duration = pins.pulseIn(echo, PulseValue.High, 30000);
 
         // Convert duration to distance in cm
         let distance = duration * 0.034 / 2;
