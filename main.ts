@@ -2,77 +2,101 @@
 namespace dCode {
 
     // --------------------------------------------------
-    // Helper
+    // Helper Functions
     // --------------------------------------------------
-    function setP2Enable(connector: Connector): void {
+    function setP2High(connector: Connector): void {
         if (connector == Connector.P2) {
             pins.digitalWritePin(DigitalPin.P8, 1)
         }
     }
 
+    function getDigitalPin(connector: Connector): DigitalPin {
+        if (connector == Connector.P0) {
+            return DigitalPin.P0
+        } else if (connector == Connector.P1) {
+            return DigitalPin.P1
+        } else {
+            pins.digitalWritePin(DigitalPin.P8, 1)
+            return DigitalPin.P2
+        }
+    }
+
+    function getAnalogPin(connector: Connector): AnalogPin {
+        if (connector == Connector.P0) {
+            return AnalogPin.P3
+        } else if (connector == Connector.P1) {
+            return AnalogPin.P4
+        } else {
+            pins.digitalWritePin(DigitalPin.P8, 1)
+            return AnalogPin.P5
+        }
+    }
+
     // --------------------------------------------------
-    // Motors
+    // Car Control
     // --------------------------------------------------
-    //% group="Motors"
-    //% blockId=motor_control block="run motor %motor %direction speed %speed"
+    //% group="Car Control"
+    //% blockId=car_control block="Move car %direction speed %speed"
     //% speed.min=0 speed.max=100
     //% speed.defl=100
-    export function runMotor(motor: Motor, direction: MotorDirection, speed: number): void {
+    export function carMove(direction: CarDirection, speed: number): void {
         let pwmValue = Math.map(speed, 0, 100, 0, 1023)
-        let pinA: AnalogPin
-        let pinB: AnalogPin
-
-        if (motor == Motor.M1) {
-            pinA = AnalogPin.P13
-            pinB = AnalogPin.P14
-        } else {
-            pinA = AnalogPin.P15
-            pinB = AnalogPin.P16
-        }
 
         switch (direction) {
-            case MotorDirection.Forward:
-                pins.analogWritePin(pinA, pwmValue)
-                pins.analogWritePin(pinB, 0)
+            case CarDirection.Forward:
+                pins.analogWritePin(AnalogPin.P13, pwmValue)
+                pins.analogWritePin(AnalogPin.P14, 0)
+                pins.analogWritePin(AnalogPin.P15, pwmValue)
+                pins.analogWritePin(AnalogPin.P16, 0)
                 break
-            case MotorDirection.Backward:
-                pins.analogWritePin(pinA, 0)
-                pins.analogWritePin(pinB, pwmValue)
+
+            case CarDirection.Backward:
+                pins.analogWritePin(AnalogPin.P13, 0)
+                pins.analogWritePin(AnalogPin.P14, pwmValue)
+                pins.analogWritePin(AnalogPin.P15, 0)
+                pins.analogWritePin(AnalogPin.P16, pwmValue)
                 break
-            case MotorDirection.Stop:
-                pins.analogWritePin(pinA, 0)
-                pins.analogWritePin(pinB, 0)
+
+            case CarDirection.Left:
+                pins.analogWritePin(AnalogPin.P13, 0)
+                pins.analogWritePin(AnalogPin.P14, pwmValue)
+                pins.analogWritePin(AnalogPin.P15, pwmValue)
+                pins.analogWritePin(AnalogPin.P16, 0)
+                break
+
+            case CarDirection.Right:
+                pins.analogWritePin(AnalogPin.P13, pwmValue)
+                pins.analogWritePin(AnalogPin.P14, 0)
+                pins.analogWritePin(AnalogPin.P15, 0)
+                pins.analogWritePin(AnalogPin.P16, pwmValue)
+                break
+
+            case CarDirection.Stop:
+                pins.analogWritePin(AnalogPin.P13, 0)
+                pins.analogWritePin(AnalogPin.P14, 0)
+                pins.analogWritePin(AnalogPin.P15, 0)
+                pins.analogWritePin(AnalogPin.P16, 0)
                 break
         }
     }
 
-    //% group="Motors"
-    //% blockId=stop_all_motors block="stop all motors"
-    export function stopAllMotors(): void {
-        pins.analogWritePin(AnalogPin.P13, 0)
-        pins.analogWritePin(AnalogPin.P14, 0)
-        pins.analogWritePin(AnalogPin.P15, 0)
-        pins.analogWritePin(AnalogPin.P16, 0)
-    }
-
-    export enum Motor {
-        //% block="M1"
-        M1 = 0,
-        //% block="M2"
-        M2 = 1
-    }
-
-    export enum MotorDirection {
-        //% block="forward"
+    //% blockId=car_direction block="%direction"
+    //% blockHidden=true
+    export enum CarDirection {
+        //% block="Forward"
         Forward = 0,
-        //% block="backward"
+        //% block="Backward"
         Backward = 1,
-        //% block="stop"
-        Stop = 2
+        //% block="Left"
+        Left = 2,
+        //% block="Right"
+        Right = 3,
+        //% block="Stop"
+        Stop = 4
     }
 
     // --------------------------------------------------
-    // Connectors
+    // Connector Enum
     // --------------------------------------------------
     export enum Connector {
         //% block="P0"
@@ -87,67 +111,41 @@ namespace dCode {
     // Sensors
     // --------------------------------------------------
     //% group="Sensors"
-    //% blockId=digital_sensor block="read digital sensor at %connector"
+    //% blockId=digital_sensor block="read Digital sensor at connector %connector"
     export function readDigitalSensor(connector: Connector): number {
-        let pin: DigitalPin
-
-        if (connector == Connector.P0) {
-            pin = DigitalPin.P0
-        } else if (connector == Connector.P1) {
-            pin = DigitalPin.P1
-        } else {
-            pin = DigitalPin.P2
-            pins.digitalWritePin(DigitalPin.P8, 1)
-        }
-
+        let pin = getDigitalPin(connector)
         pins.setPull(pin, PinPullMode.PullUp)
         return pins.digitalReadPin(pin)
     }
 
     //% group="Sensors"
-    //% blockId=analog_sensor block="read analog sensor at %connector"
+    //% blockId=analog_sensor block="read Analog sensor at connector %connector"
     export function readAnalogSensor(connector: Connector): number {
-        let pin: AnalogPin
-
-        if (connector == Connector.P0) {
-            pin = AnalogPin.P3
-        } else if (connector == Connector.P1) {
-            pin = AnalogPin.P4
-        } else {
-            pin = AnalogPin.P5
-            pins.digitalWritePin(DigitalPin.P8, 1)
-        }
-
+        let pin = getAnalogPin(connector)
         return pins.analogReadPin(pin)
     }
 
     //% group="Sensors"
-    //% blockId=dht11_sensor block="read DHT11 %dhtData at %connector"
+    //% blockId=dht11_sensor block="read DHT11 %dhtData at connector %connector"
     export function readDHT11(dhtData: DHT11Data, connector: Connector): number {
-        let pin: DigitalPin
+        let pin = getDigitalPin(connector)
         let buffer: number[] = []
         let startTime: number
         let signal: number
 
-        if (connector == Connector.P0) {
-            pin = DigitalPin.P0
-        } else if (connector == Connector.P1) {
-            pin = DigitalPin.P1
-        } else {
-            pin = DigitalPin.P2
-            pins.digitalWritePin(DigitalPin.P8, 1)
-        }
-
+        // Start signal
         pins.digitalWritePin(pin, 0)
         basic.pause(18)
         pins.digitalWritePin(pin, 1)
         control.waitMicros(40)
         pins.setPull(pin, PinPullMode.PullUp)
 
+        // Wait for response
         while (pins.digitalReadPin(pin) == 1);
         while (pins.digitalReadPin(pin) == 0);
         while (pins.digitalReadPin(pin) == 1);
 
+        // Read 40 bits
         for (let i = 0; i < 40; i++) {
             while (pins.digitalReadPin(pin) == 0);
             startTime = control.micros()
@@ -156,12 +154,14 @@ namespace dCode {
             buffer.push(signal > 40 ? 1 : 0)
         }
 
-        let humidity = (buffer.slice(0, 8).reduce((a, b) => (a << 1) | b, 0))
-        let temperature = (buffer.slice(16, 24).reduce((a, b) => (a << 1) | b, 0))
+        let humidity = buffer.slice(0, 8).reduce((a, b) => (a << 1) | b, 0)
+        let temperature = buffer.slice(16, 24).reduce((a, b) => (a << 1) | b, 0)
 
         return dhtData == DHT11Data.Temperature ? temperature : humidity
     }
 
+    //% blockId=dht11_data block="%dhtData"
+    //% blockHidden=true
     export enum DHT11Data {
         //% block="Temperature (°C)"
         Temperature = 0,
@@ -171,9 +171,9 @@ namespace dCode {
 
     // --------------------------------------------------
     // Traffic Light
-    // Red    -> P8
+    // Red -> P8
     // Yellow -> P2
-    // Green  -> P5
+    // Green -> P5
     // --------------------------------------------------
     //% group="Traffic Light"
     //% block="turn $led LED $state"
@@ -213,16 +213,16 @@ namespace dCode {
     }
 
     // --------------------------------------------------
-    // Ultrasonic
+    // Ultrasonic Sensor
     // --------------------------------------------------
     /**
      * Measure distance using ultrasonic sensor based on selected connector
-     * P0 -> trig P1, echo P0
-     * P1 -> trig P2, echo P1
-     * P2 -> trig P0, echo P2 and P8 HIGH
+     * P0 -> Trigger: P1, Echo: P0
+     * P1 -> Trigger: P2, Echo: P1
+     * P2 -> Trigger: P0, Echo: P2 and P8 HIGH
      */
     //% group="Sensors"
-    //% block="distance using %connector"
+    //% block="distance using connector %connector"
     export function readDistanceByPin(connector: Connector): number {
         let trig: DigitalPin
         let echo: DigitalPin
@@ -251,8 +251,11 @@ namespace dCode {
         return distance
     }
 
+    /**
+     * Check if obstacle is detected within 30 cm
+     */
     //% group="Sensors"
-    //% block="obstacle is there using %connector"
+    //% block="obstacle is there using connector %connector"
     export function isObstacle(connector: Connector): boolean {
         return readDistanceByPin(connector) < 30
     }
@@ -293,7 +296,9 @@ namespace dCode {
     function AutoAddr() {
         let k = true
         let addr = 0x20
-        let d1 = 0, d2 = 0
+        let d1 = 0
+        let d2 = 0
+
         while (k && (addr < 0x28)) {
             pins.i2cWriteNumber(addr, -1, NumberFormat.Int32LE)
             d1 = pins.i2cReadNumber(addr, NumberFormat.Int8LE) % 16
@@ -317,6 +322,9 @@ namespace dCode {
         else return 0
     }
 
+    /**
+     * initial LCD, set I2C address
+     */
     //% group="LCD"
     //% blockId="I2C_LCD1620_SET_ADDRESS" block="LCD initialize %addr"
     //% weight=100 blockGap=8
@@ -338,6 +346,9 @@ namespace dCode {
         cmd(0x01)
     }
 
+    /**
+     * show a number in LCD
+     */
     //% group="LCD"
     //% blockId="I2C_LCD1620_SHOW_NUMBER" block="show number %n|at x %x|y %y"
     //% weight=90 blockGap=8
@@ -349,6 +360,9 @@ namespace dCode {
         ShowString(s, x, y)
     }
 
+    /**
+     * show a string in LCD
+     */
     //% group="LCD"
     //% blockId="I2C_LCD1620_SHOW_STRING" block="show string %s|at x %x|y %y"
     //% weight=90 blockGap=8
@@ -358,10 +372,9 @@ namespace dCode {
     export function ShowString(s: string, x: number, y: number): void {
         let a: number
 
-        if (y > 0)
-            a = 0xC0
-        else
-            a = 0x80
+        if (y > 0) a = 0xC0
+        else a = 0x80
+
         a += x
         cmd(a)
 
@@ -370,6 +383,9 @@ namespace dCode {
         }
     }
 
+    /**
+     * turn on LCD
+     */
     //% group="LCD"
     //% blockId="I2C_LCD1620_ON" block="turn on LCD"
     //% weight=81 blockGap=8
@@ -378,6 +394,9 @@ namespace dCode {
         cmd(0x0C)
     }
 
+    /**
+     * turn off LCD
+     */
     //% group="LCD"
     //% blockId="I2C_LCD1620_OFF" block="turn off LCD"
     //% weight=80 blockGap=8
@@ -386,6 +405,9 @@ namespace dCode {
         cmd(0x08)
     }
 
+    /**
+     * clear LCD
+     */
     //% group="LCD"
     //% blockId="I2C_LCD1620_CLEAR" block="clear LCD"
     //% weight=85 blockGap=8
@@ -394,6 +416,9 @@ namespace dCode {
         cmd(0x01)
     }
 
+    /**
+     * turn on backlight
+     */
     //% group="LCD"
     //% blockId="I2C_LCD1620_BACKLIGHT_ON" block="turn on backlight"
     //% weight=71 blockGap=8
@@ -403,6 +428,9 @@ namespace dCode {
         cmd(0)
     }
 
+    /**
+     * turn off backlight
+     */
     //% group="LCD"
     //% blockId="I2C_LCD1620_BACKLIGHT_OFF" block="turn off backlight"
     //% weight=70 blockGap=8
@@ -412,6 +440,9 @@ namespace dCode {
         cmd(0)
     }
 
+    /**
+     * shift left
+     */
     //% group="LCD"
     //% blockId="I2C_LCD1620_SHL" block="Shift Left"
     //% weight=61 blockGap=8
@@ -420,6 +451,9 @@ namespace dCode {
         cmd(0x18)
     }
 
+    /**
+     * shift right
+     */
     //% group="LCD"
     //% blockId="I2C_LCD1620_SHR" block="Shift Right"
     //% weight=60 blockGap=8
@@ -441,6 +475,8 @@ namespace dCode {
         pins.servoSetPulse(pin, pulseWidth)
     }
 
+    //% blockId=servo_enum block="%servo"
+    //% blockHidden=true
     export enum Servo {
         //% block="S1"
         S1 = 0,
