@@ -1,4 +1,4 @@
-//% color=#6c3baa icon="\uf2db" block="Bit-Z"
+//% color=#4B136E icon="\uf2db" block="Bit-Z"
 namespace dCode {
 
     // --------------------------------------------------
